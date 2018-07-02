@@ -1,0 +1,43 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>
+      About
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <div>
+    <!-- <p *ngIf="showResult">
+      <span class="pull-right">
+        <ion-icon name="heart" color="danger"></ion-icon> {{avgBpm}} BPM
+      </span>
+      <span class="green">
+        Your Heart Rate is within the average range(71-75)
+      </span>
+    </p> -->
+    <ion-list>
+      <ion-item *ngIf="!showResult && processing">
+        <ion-spinner name="dots" item-start></ion-spinner>
+        Processing
+      </ion-item>
+      <ion-item *ngIf="!showResult && !processing">
+        <ion-spinner name="bubbles" item-start></ion-spinner>
+        Reading heart rate from your fitbit
+      </ion-item>
+      <ion-item *ngIf="showResult" class="text-center">
+        <ion-icon name="heart" color="danger"></ion-icon>
+        {{avgBpm}} BPM
+      </ion-item>
+    </ion-list>
+  </div>
+  <!-- <div class="clear"></div> -->
+  <section class="chart-wrapper">
+    <canvas #lineChart></canvas>
+  </section>
+  <div>
+    <span *ngIf="showResult" class="green">
+      Your Heart Rate is within the average range(71-75)
+    </span>
+  </div>
+</ion-content>

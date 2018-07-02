@@ -1,0 +1,24 @@
+page-about {
+    .chart-wrapper {
+        width: 100%;
+        display: inline-block; // margin: 1em 2em;
+    }
+    canvas {
+        height: 300px;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+    }
+    .green {
+        color: green;
+    }
+    .clear {
+        clear: both;
+    }
+    .pull-right {
+        float: right;
+    }
+    .text-center {
+        text-align: center;
+    }
+}

@@ -4,27 +4,44 @@
       BLE Scanner
     </ion-title>
     <ion-buttons end>
-      <button ion-button (click)="scan()">
-        Scan
-      </button>
+      <!-- <button ion-button (click)="getBondedDevices()">
+        Bonded
+      </button> -->
     </ion-buttons>
   </ion-navbar>
 </ion-header>
 
 <ion-content>
-  <button ion-button (click)="clearTimer()">clearTimer</button>
   <ion-list>
-    <button ion-item *ngFor="let device of devices">
+    <!-- <button ion-item *ngFor="let device of devices">
       <h2>{{ device.name || 'Unnamed' }}</h2>
       <p>{{ device.id }}</p>
       <p>RSSI: {{ device.rssi }}</p>
-    </button>
+    </button> -->
+    <ion-item>
+      <p>{{ statusMessage }}</p>
+    </ion-item>
+    <ion-item *ngIf="systolic">
+      <p>SYS: {{systolic}}
+        <small>mmHg</small>
+      </p>
+    </ion-item>
+    <ion-item *ngIf="diastolic">
+      <p>DIA: {{diastolic}}
+        <small>mmHg</small>
+      </p>
+    </ion-item>
+    <ion-item *ngIf="pulse">
+      <p>PULSE: {{pulse}}
+        <small>/min</small>
+      </p>
+    </ion-item>
   </ion-list>
   <button ion-button (click)="connect()">Connect</button>
 </ion-content>
 
 <ion-footer>
   <ion-toolbar>
-    <p>{{ statusMessage }}</p>
+    <!-- <p>{{ statusMessage }}</p> -->
   </ion-toolbar>
 </ion-footer>

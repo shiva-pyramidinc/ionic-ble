@@ -2,7 +2,8 @@ import { Component, NgZone } from '@angular/core';
 import { NavController, Platform } from 'ionic-angular';
 import { ToastController } from 'ionic-angular';
 import { BLE } from '@ionic-native/ble';
-
+import { TextEncoder } from 'text-encoding';
+import { BluetoothLE } from '@ionic-native/bluetooth-le';
 
 @Component({
   selector: 'page-home',
@@ -14,19 +15,25 @@ export class HomePage {
   //bp - D1:08:0B:93:BD:00
   //bp new - B0:49:5F:02:9F:E6
   //mi band - E0:39:6E:F7:D8:ED
+  //GATT BP service - 0x1810, 
+  //GATT characterestic 
+  // Blood Pressure Feature 0x2A49  
+  // Blood Pressure Measurement	0x2A35
   deviceAddress: string = 'B0:49:5F:02:9F:E6';
   devices: any[] = [];
   statusMessage: string;
   interval: any;
+  ioService: string = "1815";
+  passwordChar: string = "ffff";
+  passwordString = "675168";
+  systolic = null;
+  diastolic = null;
+  pulse = null;
 
   constructor(public navCtrl: NavController,
     private toastCtrl: ToastController,
     private ble: BLE,
-    private ngZone: NgZone,
-    private platform: Platform) {
-    this.platform.ready().then(() => {
-      this.connect();
-    })
+    private ngZone: NgZone) {
 
   }
 
@@ -72,130 +79,86 @@ export class HomePage {
     });
   }
 
+  getBondedDevices() {
+
+  }
+
+  encodeCommand(cmd: string) {
+    const encoded = new TextEncoder('utf-8').encode(`${cmd}`);
+    //encoded[0] = encoded.length - 1;
+    return encoded;
+  }
+
+  setPassword(password: string) {
+    console.log("writing passwd " + password);
+    this.ble.write(this.deviceAddress, this.ioService, this.passwordChar, this.encodeCommand(password).buffer).then(
+      () => { console.log("password written"); this.read(); },
+      e => { console.log("password Error"); console.log(JSON.stringify(e)); this.read(); }
+    );
+  }
+
   connect() {
+    this.systolic = null;
+    this.diastolic = null;
+    this.pulse = null;
+
+    this.setStatus('Connecting to BP monitor...')
     console.log("connecting...");
 
     this.ble.autoConnect(this.deviceAddress).subscribe(
       success => {
+        this.setStatus('Connected to BP monitor.')
         console.log(JSON.stringify(success));
-        // this.interval = setInterval(() => {
-        this.read(success);
-        // }, 500)
+        this.setPassword(this.passwordString);
       },
-      error => { console.log(JSON.stringify(error)) }
+      error => { this.setStatus('Disconnected from BP monitor.'); console.log(JSON.stringify(error)) }
     );
   }
 
-  read(success) {
-    /*
-    //"b305b680-aee7-11e1-a730-0002a5d5c51b"
-    this.ble.startNotification('D1:08:0B:93:BD:00', 'ecbe3980-c9a2-11e1-b1bd-0002a5d5c51b', "b305b680-aee7-11e1-a730-0002a5d5c51b").subscribe(
-      (data) => {
-        console.log("Hooray we have data" + JSON.stringify(data));
-        console.log(JSON.stringify(data));
-      }, (e) => {
-        console.log("Failed to read characteristic from device.");
-        console.log(e)
-      });
-    //"db5b55e0-aee7-11e1-965e-0002a5d5c51b"
-    this.ble.startNotification('D1:08:0B:93:BD:00', 'ecbe3980-c9a2-11e1-b1bd-0002a5d5c51b', "db5b55e0-aee7-11e1-965e-0002a5d5c51b").subscribe(
-      (data) => {
-        console.log("Hooray we have data" + JSON.stringify(data));
-        console.log(JSON.stringify(data));
-      }, (e) => {
-        console.log("Failed to read characteristic from device.");
-        console.log(e)
-      });
-    //"e0b8a060-aee7-11e1-92f4-0002a5d5c51b"
-    this.ble.startNotification('D1:08:0B:93:BD:00', 'ecbe3980-c9a2-11e1-b1bd-0002a5d5c51b', "e0b8a060-aee7-11e1-92f4-0002a5d5c51b").subscribe(
-      (data) => {
-        console.log("Hooray we have data" + JSON.stringify(data));
-        console.log(JSON.stringify(data));
-      }, (e) => {
-        console.log("Failed to read characteristic from device.");
-        console.log(e)
-      });
-    //"0ae12b00-aee8-11e1-a192-0002a5d5c51b"
-    this.ble.startNotification('D1:08:0B:93:BD:00', 'ecbe3980-c9a2-11e1-b1bd-0002a5d5c51b', "0ae12b00-aee8-11e1-a192-0002a5d5c51b").subscribe(
-      (data) => {
-        console.log("Hooray we have data" + JSON.stringify(data));
-        console.log(JSON.stringify(data));
-      }, (e) => {
-        console.log("Failed to read characteristic from device.");
-        console.log(e)
-      });
-    //"10e1ba60-aee8-11e1-89e5-0002a5d5c51b"
-    this.ble.startNotification('D1:08:0B:93:BD:00', 'ecbe3980-c9a2-11e1-b1bd-0002a5d5c51b', "10e1ba60-aee8-11e1-89e5-0002a5d5c51b").subscribe(
-      (data) => {
-        console.log("Hooray we have data" + JSON.stringify(data));
-        console.log(JSON.stringify(data));
-      }, (e) => {
-        console.log("Failed to read characteristic from device.");
-        console.log(e)
-      });
-    //"49123040-aee8-11e1-a74d-0002a5d5c51b"
-    this.ble.startNotification('D1:08:0B:93:BD:00', 'ecbe3980-c9a2-11e1-b1bd-0002a5d5c51b', "49123040-aee8-11e1-a74d-0002a5d5c51b").subscribe(
-      (data) => {
-        console.log("Hooray we have data" + JSON.stringify(data));
-        console.log(JSON.stringify(data));
-      }, (e) => {
-        console.log("Failed to read characteristic from device.");
-        console.log(e)
-      });
-    //"4d0bf320-aee8-11e1-a0d9-0002a5d5c51b"
-    this.ble.startNotification('D1:08:0B:93:BD:00', 'ecbe3980-c9a2-11e1-b1bd-0002a5d5c51b', "4d0bf320-aee8-11e1-a0d9-0002a5d5c51b").subscribe(
-      (data) => {
-        console.log("Hooray we have data" + JSON.stringify(data));
-        console.log(JSON.stringify(data));
-      }, (e) => {
-        console.log("Failed to read characteristic from device.");
-        console.log(e)
-      });
-    //"5128ce60-aee8-11e1-b84b-0002a5d5c51b"
-    this.ble.startNotification('D1:08:0B:93:BD:00', 'ecbe3980-c9a2-11e1-b1bd-0002a5d5c51b', "5128ce60-aee8-11e1-b84b-0002a5d5c51b").subscribe(
-      (data) => {
-        console.log("Hooray we have data" + JSON.stringify(data));
-        console.log(JSON.stringify(data));
-      }, (e) => {
-        console.log("Failed to read characteristic from device.");
-        console.log(e)
-      });
-      
-    //"560f1420-aee8-11e1-8184-0002a5d5c51b"
-    this.ble.startNotification(this.deviceAddress, '1810', "2a35").subscribe(
-      (data) => {
-        console.log("Hooray we have data from '1810', '2a35'");
-        console.log(JSON.stringify(data));
-      }, (e) => {
-        console.log("Failed to read characteristic from device.");
-        console.log(e)
-      });
-    //"8858eb40-aee8-11e1-bb67-0002a5d5c51b"
-    // read data from a characteristic, do something with output data
-    this.ble.startNotification(this.deviceAddress, '1810', "2a49").subscribe(
-      (data) => {
-        console.log("Hooray we have data '1810', '2a49'");
-        console.log(JSON.stringify(data));
-      }, (e) => {
-        console.log("Failed to read characteristic from device.");
-        console.log(e)
-      });
-*/
-    success.characteristics.forEach(e => {
+  read() {
+    let services = [
+      {
+        service: '1810',
+        characteristic: '2A35'
+      }];
+    this.setStatus('Fetching readings from BP monitor...')
+    services.forEach((e, i) => {
+      // success.characteristics.forEach((e, i) => {
       this.ble.startNotification(this.deviceAddress, e.service, e.characteristic).subscribe(
         (data) => {
-          console.log("Hooray we have data for");
-          console.log("Service" + e.service);
-          console.log("characteristic " + e.characteristic);
+          // console.log("startNotification: Hooray we have data for");
+          // console.log("startNotification: Service " + e.service);
+          // console.log("startNotification: characteristic " + e.characteristic);
 
           let fdata = new Uint8Array(data);
-          console.log(fdata);
+          this.setStatus('Fetched readings from BP monitor.')
           console.log(JSON.stringify(fdata));
+          this.ngZone.run(() => {
+            this.systolic = fdata[1];
+            this.diastolic = fdata[3];
+            this.pulse = fdata[14];
+          })
+
         }, (e) => {
-          console.log("Failed to read characteristic from device.");
+          this.setStatus('Failed to get readings from BP monitor.')
+          console.log("startNotification: Failed to read characteristic from device.");
           console.log(e)
         });
+
+      // this.ble.read(this.deviceAddress, e.service, e.characteristic).then(
+      //   (data) => {
+      //     console.log("read: Hooray we have data for");
+      //     console.log("read: Service " + e.service);
+      //     console.log("read: characteristic " + e.characteristic);
+
+      //     let fdata = new Uint8Array(data);
+      //     console.log(JSON.stringify(fdata));
+      //   }).catch((e) => {
+      //     console.log("read: Failed to read characteristic from device.");
+      //     console.log(e)
+      //   });
     });
+
 
   }
 

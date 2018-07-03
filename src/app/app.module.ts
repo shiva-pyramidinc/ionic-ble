@@ -13,6 +13,8 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { BLE } from '@ionic-native/ble';
 import { IBeacon } from '@ionic-native/ibeacon';
 import { BluetoothSerial } from '@ionic-native/bluetooth-serial';
+import { BluetoothLE } from '@ionic-native/bluetooth-le';
+import { BluetoothlePage } from '../pages/bluetoothle/bluetoothle';
 
 @NgModule({
   declarations: [
@@ -20,6 +22,7 @@ import { BluetoothSerial } from '@ionic-native/bluetooth-serial';
     AboutPage,
     ContactPage,
     HomePage,
+    BluetoothlePage,
     TabsPage
   ],
   imports: [
@@ -32,6 +35,7 @@ import { BluetoothSerial } from '@ionic-native/bluetooth-serial';
     AboutPage,
     ContactPage,
     HomePage,
+    BluetoothlePage,
     TabsPage
   ],
   providers: [
@@ -40,7 +44,8 @@ import { BluetoothSerial } from '@ionic-native/bluetooth-serial';
     { provide: ErrorHandler, useClass: IonicErrorHandler },
     BLE,
     IBeacon,
-    BluetoothSerial
+    BluetoothSerial,
+    BluetoothLE
   ]
 })
 export class AppModule { }

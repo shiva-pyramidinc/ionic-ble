@@ -14,11 +14,19 @@
 
 
 <ion-content padding>
-  <button ion-button full (click)="bond()">BOND</button>
+  <!-- <button ion-button full (click)="bond()">BOND</button>
   <button ion-button full (click)="unbond()">UNBOND</button>
   <button ion-button full (click)="connect()">CONNECT</button>
-  <button ion-button full (click)="disconnect()">DISCONNECT</button>
+  <button ion-button full (click)="disconnect()">DISCONNECT</button> -->
+  <button ion-button full (click)="startScan()">START SCAN</button>
+  <button ion-button full (click)="stopScan()">STOP SCAN</button>
 
+  <ion-list>
+    <ion-item *ngFor="let d of devices">
+      <p>{{d.name}}</p>
+      <p>{{d.address}}</p>
+    </ion-item>
+  </ion-list>
   <ion-list>
     <ion-item *ngIf="systolic">
       <p>SYS: {{systolic}}

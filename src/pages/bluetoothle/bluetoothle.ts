@@ -18,11 +18,12 @@ export class BluetoothlePage {
 
   bonded: boolean = false;
   connected: boolean = false;
-  deviceAddress: string = 'B0:49:5F:02:9F:E6';
+
+  deviceAddress: string = 'B0:49:5F:02:9F:E6';//B0:49:5F:02:9F:E6 || 90ED30BC-CEF3-7B0A-1A7A-1628CC2662E5
   systolic: any;
   diastolic: any;
   pulse: any;
-
+  devices: any = [];
   constructor(public navCtrl: NavController, public navParams: NavParams,
     private platform: Platform,
     private bluetoothle: BluetoothLE, private ngZone: NgZone) {
@@ -43,6 +44,41 @@ export class BluetoothlePage {
   ionViewDidLoad() {
     console.log('ionViewDidLoad BluetoothlePage');
   }
+
+  startScan() {
+    this.bluetoothle.startScan({
+      allowDuplicates: false,
+      services: [
+        "1810"
+      ]
+    }).subscribe(
+      res => {
+        console.log(JSON.stringify(res))
+        if (res.name != null) {
+          this.devices.push({
+            localName: (<any>res).localName,
+            name: res.name,
+            address: res.address
+          })
+        }
+      },
+      err => {
+        console.log(JSON.stringify(err))
+      }
+    )
+  }
+
+  stopScan() {
+    this.bluetoothle.stopScan().then(
+      res => {
+        console.log(JSON.stringify(res))
+      },
+      err => {
+        console.log(JSON.stringify(err))
+      }
+    );
+  }
+
 
   bond() {
     this.bluetoothle.bond({ "address": this.deviceAddress, autoConnect: true }).subscribe(

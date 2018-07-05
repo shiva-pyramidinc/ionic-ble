@@ -19,7 +19,7 @@ export class HomePage {
   //GATT characterestic 
   // Blood Pressure Feature 0x2A49  
   // Blood Pressure Measurement	0x2A35
-  deviceAddress: string = 'B0:49:5F:02:9F:E6';
+  deviceAddress: string = '90ED30BC-CEF3-7B0A-1A7A-1628CC2662E5';
   devices: any[] = [];
   statusMessage: string;
   interval: any;
